@@ -6,64 +6,50 @@
     <title>Document</title>
 </head>
 <?php
-    $errors = [];
-    $name = $age = $email = "";
-
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $name = $_POST["name"] ?? "";
-        $age = $_POST["age"] ?? "";
-        $email = $_POST["email"] ?? "";
-
-        if (empty($name)) {
-            $errors["name"] = "Bitte geben Sie Ihren Namen ein.";
-        };
-
-        if (empty($age)) {
-            $errors["age"] = "Bitte geben Sie Ihr Alter ein.";
-        };
-
-        if (empty($email)) {
-            $errors["email"] = "Bitte geben Sie Ihre Email ein.";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors["email"] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
-        };
-
-        if (empty($errors)) {
-            $_SESSION["formular-daten"] = $formular_daten;
-            header("Location: request.php");
-            exit();
-        }
-    };
+    require "error-check.php";
 ?>
 <body>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>">
-        <label for="name">Name: </label>
-        <input type="text" name="name" id="name" required>
+    <p>
         <?php
-            if (isset($errors["name"])) {
-                echo "<p></p>";
-            }
+            include "current-day.php";
+        ?>
+    </p>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name" value="<?php echo $name; ?>">
+        <?php
+            include "error-message.php";
+            echo $nameErr;
         ?>
         <br>
         <label for="age">Alter: </label>
-        <input type="number" name="age" id="age" required>
+        <input type="number" name="age" id="age" min="18" max="100" value="<?php echo $age; ?>">
+        <?php
+            include "error-message.php";
+            echo $ageErr;
+        ?>
         <br>
         <label for="email">Email: </label>
-        <input type="email" name="email" id="email" required>
+        <input type="email" name="email" id="email" value="<?php echo $email; ?>">
+        <?php
+            include "error-message.php";
+            echo $emailErr;
+        ?>
         <br>
         <label for="website">Webseite: </label>
-        <input type="text" name="website" id="website">
+        <input type="text" name="website" id="website"  value="<?php echo $website; ?>">
+        <?php
+            include "error-message.php";
+            echo $websiteErr;
+        ?>
         <br>
-        <label for="comment">Email: </label>
-        <textarea name="comment" id="comment" rows="5" cols="40"></textarea>
+        <label for="comment">Kommentar: </label>
+        <textarea name="comment" id="comment" rows="5" cols="40"><?php echo $comment; ?></textarea>
         <br>
         <p>Geschlecht:</p>
-        <input type="radio" name="gender" value="female" checked>Weiblein
-        <input type="radio" name="gender" value="male">Männlein
+        <input type="radio" name="gender" value="female" <?php if ($gender == "female") { echo "checked"; } ?>>Weiblein
+        <input type="radio" name="gender" value="male" <?php if ($gender == "male") { echo "checked"; } ?>>Männlein
         <input type="submit">
     </form>
-
-    <a href="request.php?link_name=John&link_age=21">Test-Link</a>
-
 </body>
 </html>

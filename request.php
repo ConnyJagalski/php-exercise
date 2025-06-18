@@ -1,41 +1,50 @@
 <?php
     session_start();
-    session_unset();
-    session_destroy();
 
-    $name = $_POST['name'];
-    $age = $_POST['age'];
-    $email = $_POST['email'];
+    $form_data = null;
+    $output = ""; // Variable für die Ausgabe initialisieren
 
-    $link_name = $_GET['link_name'];
-    $link_age = $_GET['link_age'];
-    
-    if (!empty($name) && !empty($age) && !empty($email)) {
-        echo "$name ist $age Jahre alt und hat die Email $email. <br>";
-    } else if (!empty($link_name) && !empty($link_age)) {
-        echo "$link_name ist $link_age Jahre alt.";
-    };
+    if (isset($_SESSION["formular-daten"])) {
+        $form_data = $_SESSION["formular-daten"];
+        // Session-Daten löschen, nachdem sie abgerufen wurden,
+        // damit sie bei einem erneuten Aufruf der Seite (z.B. Refresh) nicht wieder angezeigt werden.
+        unset($_SESSION["formular-daten"]);
 
-    $name = $email = $gender = $comment = $website = "";
+        // Daten sicher ausgeben
+        $name = htmlspecialchars($form_data['name']);
+        $age = htmlspecialchars($form_data['age']);
+        $email = htmlspecialchars($form_data['email']);
+        $website = htmlspecialchars($form_data['website']);
+        $comment = htmlspecialchars($form_data['comment']);
+        $gender = htmlspecialchars($form_data['gender']);
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = test_input($_POST["name"]);
-    $age = test_input($_POST["age"]);
-    $email = test_input($_POST["email"]);
-    $website = test_input($_POST["website"]);
-    $comment = test_input($_POST["comment"]);
-    $gender = test_input($_POST["gender"]);
+        $output .= "<h1>Übermittelte Formulardaten:</h1>";
+        $output .= "Name: $name <br>";
+        $output .= "Alter: $age <br>";
+        $output .= "Email: $email <br>";
+        if (!empty($website)) {
+            $output .= "Webseite: $website <br>";
+        }
+        if (!empty($comment)) {
+            $output .= "Kommentar: $comment <br>";
+        }
+        $output .= "Geschlecht: $gender <br>";
 
-    echo "Website: $website<br>";
-    echo "Kommentar: $comment<br>";
-    echo "Geschlecht: $gender<br>";
+    } else {
+        // Keine Daten in der Session gefunden, leite zum Formular zurück oder zeige eine Meldung.
+        header("Location: uebung-forms.php");
+        exit(); // Wichtig, um die weitere Skriptausführung zu beenden.
     }
-
-    function test_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-    }
-    
 ?>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulardaten Empfangen</title>
+</head>
+<body>
+    <?php echo $output; ?>
+    <p><a href="uebung-forms.php">Zurück zum Formular</a></p>
+</body>
+</html>
